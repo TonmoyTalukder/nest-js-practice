@@ -1,5 +1,7 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { AllExceptionsFilter } from './all-exceptions.filter';
+// import { MyLoggerService } from './my-logger/my-logger.service';
 // import * as fs from 'fs';
 
 // const httpsOptions = {
@@ -23,6 +25,15 @@ const corsOption = {
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule); //{httpsOptions,}
+  // {
+  //   bufferLogs: true,
+  // }
+
+  // app.useLogger(app.get(MyLoggerService));
+
+  const { httpAdapter } = app.get(HttpAdapterHost);
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
+
   app.enableCors(); // open for all, if corsOption is inside that it will be limited
   app.setGlobalPrefix('api');
 
